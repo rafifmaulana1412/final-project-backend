@@ -46,13 +46,13 @@ const start = async () => {
     await sequelize.authenticate();
     console.log("✅ Database connected");
 
-    // Sync tabel hanya setelah berhasil konek
-    await sequelize.sync({ alter: true });
-
-    const PORT = process.env.PORT || 3000;
-    app.get("/", (req, res) => {
+      app.get("/", (req, res) => {
   res.send("🚀 Backend API is running successfully on Railway!");
 });
+
+    // Sync tabel hanya setelah berhasil konek
+    await sequelize.sync({ alter: true });
+    const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
     });
