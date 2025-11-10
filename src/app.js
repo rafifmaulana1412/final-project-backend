@@ -17,12 +17,6 @@ const app = express();
 // ✅ aktifkan cors dulu
 app.use(cors());
 
-// ✅ serve folder uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// ✅ register routes sebelum express.json
-app.use("/menus", menuRoutes);
-
 // ✅ parser JSON & urlencoded dulu, biar semua route dapet body parser yg benar
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
