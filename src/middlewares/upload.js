@@ -1,25 +1,25 @@
 const multer = require("multer");
 const path = require("path");
-require("dotenv").config();
+const fs = require("fs");
 
+// Bikin folder uploads kalau belum ada
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("📁 Folder uploads dibuat:", uploadDir);
+}
+
+// Setup storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, process.env.UPLOAD_DIR),
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
-    const unique = Date.now() + path.extname(file.originalname);
-    cb(null, "menu-" + unique);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowed = [".png", ".jpg", ".jpeg", ".gif"];
-  const ext = path.extname(file.originalname).toLowerCase();
-  cb(null, allowed.includes(ext));
-};
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
+const upload = multer({ storage });
 
 module.exports = upload;
