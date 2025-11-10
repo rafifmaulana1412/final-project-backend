@@ -17,6 +17,19 @@ const roleRoutes = require("./routes/roleRoutes");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 
+// ✅ tambahkan ini
+app.post("/sync-db", async (req, res) => {
+  try {
+    await sequelize.sync({ alter: true });
+    res.status(200).json({
+      message: "✅ All local tables have been synchronized successfully to Railway!",
+    });
+  } catch (error) {
+    console.error("❌ Database sync failed:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const app = express();
 
 // ✅ aktifkan cors dulu
