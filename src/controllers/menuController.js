@@ -36,37 +36,31 @@ exports.getMenuById = async (req, res) => {
 // ✅ CREATE MENU (pakai Cloudinary)
 exports.createMenu = async (req, res) => {
   try {
-    const { name, price, categoryId, description } = req.body;
+    const { name, price, description, categoryId } = req.body;
+    console.log("📥 Body:", req.body);
+    console.log("📸 File:", req.file);
 
-    if (!name || !price || !categoryId) {
-      return res
-        .status(400)
-        .json({ error: "Name, price, and category are required" });
-    }
+    const imageUrl = req.file?.path || null;
 
-    const imageUrl = req.file ? req.file.path : null; // ✅ Cloudinary URL
-
-    const menu = await Menu.create({
+    const newMenu = await Menu.create({
       name,
-      price: Number(price),
-      categoryId: Number(categoryId),
-      image: imageUrl,
+      price,
       description,
+      categoryId,
+      image: imageUrl,
     });
 
-    console.log("✅ Menu created:", menu);
-    res.status(201).json(menu);
-  } } catch (error) {
-  console.error("❌ Error creating menu:", JSON.stringify(error, null, 2));
-  res.status(500).json({
-    message: "Server error",
-    error: error.message || error,
-    stack: error.stack,
-  });
-}
-
+    res.status(201).json(newMenu);
+  } catch (error) {
+    console.error("❌ Error creating menu:", JSON.stringify(error, null, 2));
+    res.status(500).json({
+      message: "Server error",
+      error: error.message || error,
+      stack: error.stack,
+    });
   }
 };
+
 
 // ✅ UPDATE MENU
 exports.updateMenu = async (req, res) => {
