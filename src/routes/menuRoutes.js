@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const menuController = require("../controllers/menuController");
 const { verifyToken, allowRoles } = require("../middlewares/authMiddleware");
-const upload = require("../middlewares/uploads);
+const upload = require("../middlewares/uploads");
 
 // 🧭 ROUTES
 router.get("/", menuController.getAllMenus);
