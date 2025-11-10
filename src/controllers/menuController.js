@@ -53,6 +53,7 @@ exports.createMenu = async (req, res) => {
     res.status(201).json(newMenu);
   } catch (error) {
     console.error("❌ Error creating menu:", JSON.stringify(error, null, 2));
+      console.error("🧩 Full error detail:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     res.status(500).json({
       message: "Server error",
       error: error.message || error,
