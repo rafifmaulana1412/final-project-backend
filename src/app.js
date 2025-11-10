@@ -17,6 +17,8 @@ const roleRoutes = require("./routes/roleRoutes");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 
+const app = express();
+
 // ✅ tambahkan ini
 app.post("/sync-db", async (req, res) => {
   try {
@@ -29,8 +31,6 @@ app.post("/sync-db", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-const app = express();
 
 // ✅ aktifkan cors dulu
 app.use(cors());
