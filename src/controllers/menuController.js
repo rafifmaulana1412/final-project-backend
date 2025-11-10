@@ -56,9 +56,15 @@ exports.createMenu = async (req, res) => {
 
     console.log("✅ Menu created:", menu);
     res.status(201).json(menu);
-  } catch (err) {
-    console.error("❌ Error creating menu:", err);
-    res.status(500).json({ error: "Failed to create menu" });
+  } } catch (error) {
+  console.error("❌ Error creating menu:", JSON.stringify(error, null, 2));
+  res.status(500).json({
+    message: "Server error",
+    error: error.message || error,
+    stack: error.stack,
+  });
+}
+
   }
 };
 
