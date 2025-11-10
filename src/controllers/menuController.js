@@ -36,9 +36,15 @@ exports.getMenuById = async (req, res) => {
 // ✅ CREATE MENU (pakai Cloudinary)
 exports.createMenu = async (req, res) => {
   try {
+    console.log("====== 📥 CREATE MENU REQUEST ======");
+    console.log("📦 Body:", req.body);
+    console.log("🖼️ File:", req.file);
+
     const { name, price, description, categoryId } = req.body;
-    console.log("📥 Body:", req.body);
-    console.log("📸 File:", req.file);
+
+    if (!req.file) {
+      console.warn("⚠️ No file uploaded!");
+    }
 
     const imageUrl = req.file?.path || null;
 
@@ -50,14 +56,21 @@ exports.createMenu = async (req, res) => {
       image: imageUrl,
     });
 
+    console.log("✅ Menu created:", newMenu);
     res.status(201).json(newMenu);
   } catch (error) {
-    console.error("❌ Error creating menu:", JSON.stringify(error, null, 2));
-      console.error("🧩 Full error detail:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    console.log("====== ❌ ERROR LOG START ======");
+    console.log("📛 Raw error (direct):", error);
+    console.log("📛 Error keys:", Object.keys(error));
+    console.log("📛 Error message:", error.message);
+    console.log("📛 Error stack:", error.stack);
+    console.log("📛 Stringified error:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    console.log("====== ❌ ERROR LOG END ======");
+
     res.status(500).json({
       message: "Server error",
-      error: error.message || error,
-      stack: error.stack,
+      error: error.message || "Unknown error",
+      details: error.errors || null,
     });
   }
 };
