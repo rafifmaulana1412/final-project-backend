@@ -33,7 +33,7 @@ exports.getMenuById = async (req, res) => {
   }
 };
 
-// ✅ CREATE MENU (pakai Cloudinary)
+// ✅ CREATE MENU 
 exports.createMenu = async (req, res) => {
   try {
     console.log("====== 📥 CREATE MENU REQUEST ======");
@@ -46,7 +46,7 @@ exports.createMenu = async (req, res) => {
       console.warn("⚠️ No file uploaded!");
     }
 
-    const imageUrl = req.file?.path || null;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     const newMenu = await Menu.create({
       name,
@@ -85,7 +85,7 @@ exports.updateMenu = async (req, res) => {
     const menu = await Menu.findByPk(id);
     if (!menu) return res.status(404).json({ error: "Menu not found" });
 
-    const newImage = req.file ? req.file.path : menu.image; // pakai Cloudinary path kalau ada upload baru
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     await menu.update({
       name,
