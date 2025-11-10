@@ -1,12 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
+
+// ✅ Load env kalau bukan di production
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
+
 console.log("NODE_ENV:", process.env.NODE_ENV);
 console.log("DATABASE_URL exists?", !!process.env.DATABASE_URL);
-
 
 const { sequelize } = require("./models");
 const menuRoutes = require("./routes/menuRoutes");
@@ -19,12 +22,30 @@ const cartRoutes = require("./routes/cartRoutes");
 
 const app = express();
 
-// ✅ tambahkan ini
+// ✅ Pastikan folder uploads ada
+const uploadPath = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+  console.log("📁 Folder 'uploads' dibuat di:", uploadPath);
+}
+
+// ✅ CORS aktif duluan
+app.use(cors());
+
+// ✅ Parser JSON & URL-encoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ Serve folder uploads biar bisa diakses publik
+app.use("/uploads", express.static(uploadPath));
+
+// ✅ Route untuk tes sync database manual
 app.post("/sync-db", async (req, res) => {
   try {
     await sequelize.sync({ alter: true });
     res.status(200).json({
-      message: "✅ All local tables have been synchronized successfully to Railway!",
+      message:
+        "✅ All local tables have been synchronized successfully to Railway!",
     });
   } catch (error) {
     console.error("❌ Database sync failed:", error);
@@ -32,17 +53,7 @@ app.post("/sync-db", async (req, res) => {
   }
 });
 
-// ✅ aktifkan cors dulu
-app.use(cors());
-
-// ✅ parser JSON & urlencoded dulu, biar semua route dapet body parser yg benar
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// ✅ serve folder uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// ✅ routes
+// ✅ Routes utama
 app.use("/menus", menuRoutes);
 app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
@@ -51,6 +62,12 @@ app.use("/roles", roleRoutes);
 app.use("/auth", authRoutes);
 app.use("/cart", cartRoutes);
 
+// ✅ Route utama (homepage test)
+app.get("/", (req, res) => {
+  res.send("🚀 Backend API is running successfully on Railway!");
+});
+
+// ✅ Start server
 const start = async () => {
   try {
     console.log("NODE_ENV:", process.env.NODE_ENV);
@@ -59,12 +76,8 @@ const start = async () => {
     await sequelize.authenticate();
     console.log("✅ Database connected");
 
-      app.get("/", (req, res) => {
-  res.send("🚀 Backend API is running successfully on Railway!");
-});
-
-    // Sync tabel hanya setelah berhasil konek
     await sequelize.sync({ alter: true });
+
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
