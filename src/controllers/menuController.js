@@ -1,41 +1,31 @@
 const { Menu, Category } = require("../models");
 
-// ✅ GET ALL MENUS (produk)
+// ✅ GET ALL MENUS
 exports.getAllMenus = async (req, res) => {
   try {
     const menus = await Menu.findAll({
       include: [
-        {
-          model: Category,
-          as: "menuCategory",
-          attributes: ["id", "name"], // tampilkan nama kategori
-        },
+        { model: Category, as: "menuCategory", attributes: ["id", "name"] },
       ],
       order: [["id", "ASC"]],
     });
-
     res.json(menus);
   } catch (err) {
     console.error("❌ Error fetching menus:", err);
     res.status(500).json({ error: "Failed to retrieve menus" });
   }
 };
+
 // ✅ GET MENU BY ID
 exports.getMenuById = async (req, res) => {
   try {
     const { id } = req.params;
     const menu = await Menu.findByPk(id, {
       include: [
-        {
-          model: Category,
-          as: "menuCategory",
-          attributes: ["id", "name"],
-        },
+        { model: Category, as: "menuCategory", attributes: ["id", "name"] },
       ],
     });
-
     if (!menu) return res.status(404).json({ error: "Menu not found" });
-
     res.json(menu);
   } catch (err) {
     console.error("❌ Error fetching menu by ID:", err);
@@ -43,21 +33,24 @@ exports.getMenuById = async (req, res) => {
   }
 };
 
-// ✅ CREATE MENU
+// ✅ CREATE MENU (pakai Cloudinary)
 exports.createMenu = async (req, res) => {
   try {
     const { name, price, categoryId, description } = req.body;
+
     if (!name || !price || !categoryId) {
       return res
         .status(400)
         .json({ error: "Name, price, and category are required" });
     }
 
+    const imageUrl = req.file ? req.file.path : null; // ✅ Cloudinary URL
+
     const menu = await Menu.create({
       name,
       price: Number(price),
       categoryId: Number(categoryId),
-      image: req.file ? req.file.filename : null,
+      image: imageUrl,
       description,
     });
 
@@ -68,6 +61,7 @@ exports.createMenu = async (req, res) => {
     res.status(500).json({ error: "Failed to create menu" });
   }
 };
+
 // ✅ UPDATE MENU
 exports.updateMenu = async (req, res) => {
   try {
@@ -77,7 +71,16 @@ exports.updateMenu = async (req, res) => {
     const menu = await Menu.findByPk(id);
     if (!menu) return res.status(404).json({ error: "Menu not found" });
 
-    await menu.update({ name, price, categoryId, description });
+    const newImage = req.file ? req.file.path : menu.image; // pakai Cloudinary path kalau ada upload baru
+
+    await menu.update({
+      name,
+      price,
+      categoryId,
+      description,
+      image: newImage,
+    });
+
     res.json(menu);
   } catch (err) {
     console.error("❌ Error updating menu:", err);
