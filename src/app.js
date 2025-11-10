@@ -4,6 +4,9 @@ const path = require("path");
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("DATABASE_URL exists?", !!process.env.DATABASE_URL);
+
 
 const { sequelize } = require("./models");
 const menuRoutes = require("./routes/menuRoutes");
@@ -37,14 +40,21 @@ app.use("/cart", cartRoutes);
 
 const start = async () => {
   try {
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("DATABASE_URL exists?", !!process.env.DATABASE_URL);
+
+    await sequelize.authenticate();
+    console.log("✅ Database connected");
+
+    // Sync tabel hanya setelah berhasil konek
     await sequelize.sync({ alter: true });
-    app.listen(process.env.PORT || 3000, () => {
-      console.log(
-        `✅ Server running on http://localhost:${process.env.PORT || 3000}`
-      );
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("❌ Failed to start server:", err.message);
+    console.error("❌ Failed to start server:", err);
   }
 };
 
