@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cartCtrl = require("../controllers/cartController");
-const { verifyToken, allowRoles } = require("../middleware/authMiddleware"); // jangan pakai "middlewares"
+const { verifyToken, allowRoles } = require("../middlewares/authMiddleware"); 
 
 // ✅ ambil cart user login
 router.get("/", verifyToken, allowRoles("customer"), cartCtrl.getCart);
