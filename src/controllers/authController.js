@@ -19,23 +19,21 @@ async function registerUser(req, res, role) {
   try {
     const { name, email, password, phone } = req.body;
 
-    // Validasi input
+    // ✅ Log biar tau isi body dari frontend
+    console.log("📥 Register body:", req.body);
+
     if (!name || !email || !password) {
       return res
         .status(400)
         .json({ message: "Name, email, and password are required" });
     }
 
-    // Cek duplikasi email
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Buat user baru
     const newUser = await User.create({
       name,
       email,
@@ -44,7 +42,6 @@ async function registerUser(req, res, role) {
       role,
     });
 
-    // Generate token langsung
     const token = generateToken(newUser);
 
     res.status(201).json({
@@ -68,6 +65,8 @@ async function registerUser(req, res, role) {
 // ==============================
 async function loginUser(req, res, role) {
   try {
+    console.log("📥 Login body:", req.body); // ✅ log tambahan
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -81,20 +80,17 @@ async function loginUser(req, res, role) {
       return res.status(404).json({ message: `${role} not found` });
     }
 
-    // Pastikan role sesuai
     if (user.role !== role) {
       return res.status(403).json({
         message: `Access denied. Only ${role} can login here.`,
       });
     }
 
-    // Cek password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Generate token
     const token = generateToken(user);
 
     res.json({
@@ -118,6 +114,8 @@ async function loginUser(req, res, role) {
 // ==============================
 exports.login = async (req, res) => {
   try {
+    console.log("📥 Universal login body:", req.body); // ✅ log tambahan
+
     const { email, password } = req.body;
     if (!email || !password) {
       return res
