@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const cartCtrl = require("../controllers/cartController");
-const { verifyToken, allowRoles } = require("../middlewares/authMiddleware"); 
+
+// ⚠️ perhatikan, sesuaikan nama folder di repo kamu
+const { verifyToken, allowRoles } = require("../middlewares/authMiddleware");
+
+// =============================
+// 🛒 CART ROUTES
+// =============================
 
 // ✅ ambil cart user login
 router.get("/", verifyToken, allowRoles("customer"), cartCtrl.getCart);
