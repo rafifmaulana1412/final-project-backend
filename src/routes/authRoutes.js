@@ -22,4 +22,10 @@ router.post("/login-customer", authController.loginCustomer);
 // UNIVERSAL LOGIN (opsional)
 // ==========================
 router.post("/login", authController.login);
+
+// ==========================
+// UNIVERSAL REGISTER (baru)
+// ==========================
+router.post("/register", authController.register);
+  
 module.exports = router;
