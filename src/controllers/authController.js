@@ -161,3 +161,25 @@ exports.loginEditor = (req, res) => loginUser(req, res, "editor");
 
 exports.registerCustomer = (req, res) => registerUser(req, res, "customer");
 exports.loginCustomer = (req, res) => loginUser(req, res, "customer");
+
+// ==============================
+// UNIVERSAL REGISTER (baru)
+// ==============================
+exports.register = async (req, res) => {
+  try {
+    const { name, email, password, phone, role } = req.body;
+
+    console.log("📥 Universal Register body:", req.body);
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ message: "Name, email, password, and role are required" });
+    }
+
+    // Panggil helper registerUser dengan role sesuai body
+    await registerUser(req, res, role);
+  } catch (error) {
+    console.error("❌ Universal Register error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
